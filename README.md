@@ -43,7 +43,7 @@ This project might be improved by training a single model which contains all the
 4.5 Install poppler by writing ‘conda install -c conda-forge poppler’ on terminal or command prompt. 
 
 5. Change the current directory to the directory where you want to clone the repository on terminal or command prompt.
-6. Clone the repository and cd into zna2 folder.
+6. Clone the repository and cd into final_year_project folder.
 7. Run 'python manage.py runserver'.
 8. The website started to run at http://127.0.0.1:8000/ link on localhost. It is just enough to copy and paste this link to access website.
 
