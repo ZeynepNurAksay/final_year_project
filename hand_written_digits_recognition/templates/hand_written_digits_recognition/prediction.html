@@ -1,0 +1,265 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Prediction Page</title>
+        <!-- Bootstrap imports -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <!-- Header -->
+        <h1 style="font-size: 50px; text-align: center;">{{type}} DIGIT DETECTOR</h1>
+        <!-- Redirects user to index page -->
+        <a href="{% url 'index' %}" style="margin-left: 47%;margin-bottom: 20px; display: flex;"><button style="background-color: black; color: white; padding: 10px; border-radius: 10px;">Go Back</button></a>
+        
+        <!-- If there is a problem, prints out an informative message to the user -->
+        {% if message %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{message}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endif %}
+
+        <!-- If the link is European, the view displayed to the user -->
+        {% if type == 'EUROPEAN' %}
+
+        <!-- form that submits the uploaded file to european link -->
+        <form action="{% url 'european' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="margin-left: 35%; height: 500px; width: 400px; border-radius: 10px; border: 1px solid black; text-align: center;">
+                
+                <!-- If there is a image, image is displayed. Else the form to upload a file is displayed -->
+                {% if image %}
+                    <!-- if the image is from pdf files, the page is displayed. Else there is only one image, so only the image is displayed. -->
+                    {% if page %}
+                    <img src="../../media/2_{{page}}" id="detected_image" alt="detected_image" style="height: 500px; width: 400px; border-radius: 10px;">
+                    <img id="preview-selected-image-2" style="display: none; height: 500px; width: 400px; border-radius: 10px;"/>
+                    {% else %}
+                    <img src="{{image}}" id="detected_image" alt="detected_image" style="height: 500px; width: 400px; border-radius: 10px;">
+                    <img id="preview-selected-image-2" style="display: none; height: 500px; width: 400px; border-radius: 10px;"/>
+                    {% endif %}
+                    
+                {% else %}
+                    <p style="display: none;" onchange="previewImage(event);">{{ form.file }}</p>
+                    <label id="european_label" for="european_file" style="background-color: black; display:inline-block; margin-top: 50%;color: white; padding: 10px; border-radius: 10px;">Choose a (.jpg, .jpeg, .pdf) file...</label>
+                    <img id="preview-selected-image" style="display: none; height: 500px; width: 400px; border-radius: 10px;"/>
+                {% endif %}
+            </div>
+            <center>
+
+                <!-- if the uploaded file is pdf, below view showed to the user-->
+                {% if file_is_pdf %}
+
+                    <!-- links to see the previous and next pages for pdf files -->
+                    {% if current_page == 1 %}
+                    <div id="page" style="margin-left: 45%;">
+                        <br>
+                        <a id="previous" style="float: left; margin-right: 1%;" href="{% url 'european_page' 1 %}"><</a><p style="float: left" id="current_page">{{current_page}}</p><p style="float: left;">/{{total_page}}</p><a id="next" style="float: left; margin-left: 1%;" href="{% url 'european_page' current_page|add:'1' %}">></a>
+                        <br>
+                        <br>
+                    </div>
+                    {% elif current_page == total_page %}
+                    <div id="page" style="margin-left: 45%;">
+                        <br>
+                        <a id="previous" style="float: left; margin-right: 1%;" href="{% url 'european_page' current_page|add:'-1'  %}"><</a><p style="float: left" id="current_page">{{current_page}}</p><p style="float: left;">/{{total_page}}</p><a id="next" style="float: left; margin-left: 1%;" href="{% url 'european_page'  total_page %}">></a>
+                        <br>
+                        <br>
+                    </div>
+                    {% else %}
+                    <div id="page" style="margin-left: 45%;">
+                        <br>
+                        <a id="previous" style="float: left; margin-right: 1%;" href="{% url 'european_page' current_page|add:'-1' %}"><</a><p style="float: left" id="current_page">{{current_page}}</p><p style="float: left;">/{{total_page}}</p><a id="next" style="float: left; margin-left: 1%;" href="{% url 'european_page'  current_page|add:'1' %}">></a>
+                        <br>
+                        <br>
+                    </div>
+                    {% endif %}
+                {% endif %}
+                
+                <!-- the second form for uploading another file, if the previous selected file is wrong. -->
+                {% if image %}
+                    <p style="display: none;" onchange="previewImage2(event);">{{ form.file }}</p>
+                    <label id="european_label_3" for="european_file" style="background-color: black; display:inline-block; color: white; padding: 10px; border-radius: 10px;">Choose a (.jpg, .jpeg, .pdf) file...</label>
+                {% endif %}
+
+                <!-- submits the form -->
+                <label id="european_label_2" for="european_file" style="background-color: black; display:none; color: white; padding: 10px; border-radius: 10px;">Choose another (.jpg, .jpeg, .pdf) file...</label>
+                <button type="submit" style="margin-top: 1%; background-color: black; color: white; padding: 10px; border-radius: 10px;">Detect Digits</button>
+            </center>
+        </form>
+        {% endif %}
+
+        <!-- If the link is Chinese, the view displayed to the user -->
+        {% if type == 'CHINESE' %}
+
+        <!-- form that submits the uploaded file to chinese link -->
+        <form action="{% url 'chinese' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="margin-left: 35%; height: 500px; width: 400px; border-radius: 10px; border: 1px solid black; text-align: center;">
+                
+                <!-- If there is a image, image is displayed. Else the form to upload a file is displayed -->
+                {% if image %}
+
+                    <!-- if the image is from pdf files, the page is displayed. Else there is only one image, so only the image is displayed. -->
+                    {% if page %}
+                    <img src="../../media/2_{{page}}" id="detected_image" alt="detected_image" style="height: 500px; width: 400px; border-radius: 10px;">
+                    <img id="preview-selected-image-2" style="display: none; height: 500px; width: 400px; border-radius: 10px;"/>
+                    {% else %}
+                    <img src="{{image}}" id="detected_image" alt="detected_image" style="height: 500px; width: 400px; border-radius: 10px;">
+                    <img id="preview-selected-image-2" style="display: none; height: 500px; width: 400px; border-radius: 10px;"/>
+                    {% endif %}
+                {% else %}
+                    <p style="display: none;" onchange="previewImage(event);">{{ form.file }}</p>
+                    <label id="european_label" for="european_file" style="background-color: black; display:inline-block; margin-top: 50%;color: white; padding: 10px; border-radius: 10px;">Choose a (.jpg, .jpeg, .pdf) file...</label>
+                    <img id="preview-selected-image" style="display: none; height: 500px; width: 400px; border-radius: 10px;"/>
+                {% endif %}
+            </div>
+            <center>
+
+                <!-- if the uploaded file is pdf, below view showed to the user-->
+                {% if file_is_pdf %}
+
+                    <!-- links to see the previous and next pages for pdf files -->
+                    {% if current_page == 1 %}
+                    <div id="page" style="margin-left: 45%;">
+                        <br>
+                        <a id="previous" style="float: left; margin-right: 1%;" href="{% url 'chinese_page' 1 %}"><</a><p style="float: left" id="current_page">{{current_page}}</p><p style="float: left;">/{{total_page}}</p><a id="next" style="float: left; margin-left: 1%;" href="{% url 'chinese_page' current_page|add:'1' %}">></a>
+                        <br>
+                        <br>
+                    </div>
+                    {% elif current_page == total_page %}
+                    <div id="page" style="margin-left: 45%;">
+                        <br>
+                        <a id="previous" style="float: left; margin-right: 1%;" href="{% url 'chinese_page' current_page|add:'-1'  %}"><</a><p style="float: left" id="current_page">{{current_page}}</p><p style="float: left;">/{{total_page}}</p><a id="next" style="float: left; margin-left: 1%;" href="{% url 'chinese_page'  total_page %}">></a>
+                        <br>
+                        <br>
+                    </div>
+                    {% else %}
+                    <div id="page" style="margin-left: 45%;">
+                        <br>
+                        <a id="previous" style="float: left; margin-right: 1%;" href="{% url 'chinese_page' current_page|add:'-1' %}"><</a><p style="float: left" id="current_page">{{current_page}}</p><p style="float: left;">/{{total_page}}</p><a id="next" style="float: left; margin-left: 1%;" href="{% url 'chinese_page'  current_page|add:'1' %}">></a>
+                        <br>
+                        <br>
+                    </div>
+                    {% endif %}
+                {% endif %}
+
+                <!-- the second form for uploading another file, if the previous selected file is wrong. -->
+                {% if image %}
+                    <p style="display: none;" onchange="previewImage2(event);">{{ form.file }}</p>
+                    <label id="european_label_3" for="european_file" style="background-color: black; display:inline-block; color: white; padding: 10px; border-radius: 10px;">Choose a (.jpg, .jpeg, .pdf) file...</label>
+                {% endif %}
+
+                <!-- submits the form -->
+                <label id="european_label_2" for="european_file" style="background-color: black; display:none; color: white; padding: 10px; border-radius: 10px;">Choose another (.jpg, .jpeg, .pdf) file...</label>
+                <button type="submit" style="margin-top: 1%; background-color: black; color: white; padding: 10px; border-radius: 10px;">Detect Digits</button>
+            </center>
+        </form>
+        {% endif %}
+
+        <!-- If the link is Arabic, the view displayed to the user -->
+        {% if type == 'ARABIC' %}
+
+        <!-- form that submits the uploaded file to arabic link -->
+        <form action="{% url 'arabic' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="margin-left: 35%; height: 500px; width: 400px; border-radius: 10px; border: 1px solid black; text-align: center;">
+                
+                <!-- If there is a image, image is displayed. Else the form to upload a file is displayed -->
+                {% if image %}
+
+                    <!-- if the image is from pdf files, the page is displayed. Else there is only one image, so only the image is displayed. -->
+                    {% if page %}
+                    <img src="../../media/2_{{page}}" id="detected_image" alt="detected_image" style="height: 500px; width: 400px; border-radius: 10px;">
+                    <img id="preview-selected-image-2" style="display: none; height: 500px; width: 400px; border-radius: 10px;"/>
+                    {% else %}
+                    <img src="{{image}}" id="detected_image" alt="detected_image" style="height: 500px; width: 400px; border-radius: 10px;">
+                    <img id="preview-selected-image-2" style="display: none; height: 500px; width: 400px; border-radius: 10px;"/>
+                    {% endif %}
+                {% else %}
+                    <p style="display: none;" onchange="previewImage(event);">{{ form.file }}</p>
+                    <label id="european_label" for="european_file" style="background-color: black; display:inline-block; margin-top: 50%;color: white; padding: 10px; border-radius: 10px;">Choose a (.jpg, .jpeg, .pdf) file...</label>
+                    <img id="preview-selected-image" style="display: none; height: 500px; width: 400px; border-radius: 10px;"/>
+                {% endif %}
+            </div>
+            <center>
+
+                <!-- if the uploaded file is pdf, below view showed to the user-->
+                {% if file_is_pdf %}
+
+                    <!-- links to see the previous and next pages for pdf files -->
+                    {% if current_page == 1 %}
+                    <div id="page" style="margin-left: 45%;">
+                        <br>
+                        <a id="previous" style="float: left; margin-right: 1%;" href="{% url 'arabic_page' 1 %}"><</a><p style="float: left" id="current_page">{{current_page}}</p><p style="float: left;">/{{total_page}}</p><a id="next" style="float: left; margin-left: 1%;" href="{% url 'arabic_page' current_page|add:'1' %}">></a>
+                        <br>
+                        <br>
+                    </div>
+                    {% elif current_page == total_page %}
+                    <div id="page" style="margin-left: 45%;">
+                        <br>
+                        <a id="previous" style="float: left; margin-right: 1%;" href="{% url 'arabic_page' current_page|add:'-1'  %}"><</a><p style="float: left" id="current_page">{{current_page}}</p><p style="float: left;">/{{total_page}}</p><a id="next" style="float: left; margin-left: 1%;" href="{% url 'arabic_page'  total_page %}">></a>
+                        <br>
+                        <br>
+                    </div>
+                    {% else %}
+                    <div id="page" style="margin-left: 45%;">
+                        <br>
+                        <a id="previous" style="float: left; margin-right: 1%;" href="{% url 'arabic_page' current_page|add:'-1' %}"><</a><p style="float: left" id="current_page">{{current_page}}</p><p style="float: left;">/{{total_page}}</p><a id="next" style="float: left; margin-left: 1%;" href="{% url 'arabic_page'  current_page|add:'1' %}">></a>
+                        <br>
+                        <br>
+                    </div>
+                    {% endif %}
+                {% endif %}
+
+                <!-- the second form for uploading another file, if the previous selected file is wrong. -->
+                {% if image %}
+                    <p style="display: none;" onchange="previewImage2(event);">{{ form.file }}</p>
+                    <label id="european_label_3" for="european_file" style="background-color: black; display:inline-block; color: white; padding: 10px; border-radius: 10px;">Choose a (.jpg, .jpeg, .pdf) file...</label>
+                {% endif %}
+
+                <!-- submits the form -->
+                <label id="european_label_2" for="european_file" style="background-color: black; display:none; color: white; padding: 10px; border-radius: 10px;">Choose another (.jpg, .jpeg, .pdf) file...</label>
+                <button type="submit" style="margin-top: 1%; background-color: black; color: white; padding: 10px; border-radius: 10px;">Detect Digits</button>
+            </center>
+        </form>
+        {% endif %}
+
+        <!-- javascript code -->
+        <script>
+
+            // previews the selected image file, or the first page of the pdf file
+            const previewImage = (event) => {
+                const imageFiles = event.target.files;
+                const imageSrc = URL.createObjectURL(imageFiles[0]);
+                const imagePreviewElement = document.querySelector("#preview-selected-image");
+                imagePreviewElement.src = imageSrc;
+                imagePreviewElement.style.display = "block";
+                const european_label = document.querySelector("#european_label");
+                european_label.style.display = "none";
+                const european_label_2 = document.querySelector("#european_label_2");
+                european_label_2.style.display = "inline-block";
+                const detected_image = document.querySelector("#detected_image");
+                detected_image.style.display = "none";
+            };
+
+            // previews the selected image file, or the first page of the pdf file
+            const previewImage2 = (event) => {
+                const imageFiles = event.target.files;
+                const imageSrc = URL.createObjectURL(imageFiles[0]);
+                const imagePreviewElement = document.querySelector("#preview-selected-image-2");
+                imagePreviewElement.src = imageSrc;
+                imagePreviewElement.style.display = "block";
+                const detected_image = document.querySelector("#detected_image");
+                detected_image.style.display = "none";
+                document.querySelector("#page").style.display = 'none';
+            };
+            
+        </script>
+    </body>
+</html>

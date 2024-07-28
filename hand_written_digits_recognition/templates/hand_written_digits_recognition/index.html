@@ -1,0 +1,39 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Index Page</title>
+    </head>
+    <body>
+        <!-- Header -->
+        <h1 style="font-size: 90px; text-align: center;">DIGIT DETECTOR</h1>
+        
+        <div style="margin-left: 5%;">
+
+            <!-- European digit detector link -->
+            <a href="{% url 'european' %}">
+                <div id="european" style="float: left; margin: 0 1%; border:1px solid black; height: 30%; border-radius: 10%; padding: 3%;">
+                    <img src="{% static 'hand_written_digits_recognition/european.jpeg' %}" alt="european" style="height: 300px;">
+                    <h2 style="text-align: center;">European Digit Detector</h2>
+                </div>
+            </a>
+            
+            <!-- Chinese digit detector link -->
+            <a href="{% url 'chinese' %}">
+                <div id="chinese" style="float: left; margin: 0 1%; border:1px solid black; height: 30%; border-radius: 10%; padding: 3%;">
+                    <img src="{% static 'hand_written_digits_recognition/chinese.jpeg' %}" alt="chinese" style="height: 300px;">
+                    <h2 style="text-align: center;">Chinese Digit Detector</h2>
+                </div>
+            </a>
+            
+            <!-- Arabic digit detector link -->
+            <a href="{% url 'arabic' %}">
+                <div id="arabic" style="float: left; margin: 0 1%; border:1px solid black; height: 30%; border-radius: 10%; padding: 3%;">
+                    <img src="{% static 'hand_written_digits_recognition/arabic.jpeg' %}" alt="arabic" style="height: 300px;">
+                    <h2 style="text-align: center;">Arabic Digit Detector</h2>
+                </div>
+            </a>
+        </div>
+    </body>
+</html>

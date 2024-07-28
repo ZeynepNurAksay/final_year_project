@@ -1,0 +1,26 @@
+names:
+- 0 -zero-
+- 1 -one-
+- 10 -ten-
+- 100 -a hundred-
+- 1000 -a thousand-
+- 10000 -a ten thousand-
+- 100000 -a hundred thousand-
+- 2 -two-
+- 3 -three-
+- 4 -four-
+- 5 -five-
+- 6 -six-
+- 7 -seven-
+- 8 -eight-
+- 9 -nine-
+nc: 15
+roboflow:
+  license: Public Domain
+  project: chinese-digits
+  url: https://universe.roboflow.com/object-detection-uscpv/chinese-digits/dataset/17
+  version: 17
+  workspace: object-detection-uscpv
+test: ../test/images
+train: ../train/images
+val: ../valid/images
